@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Upload } from "lucide-react"
 
@@ -22,12 +21,8 @@ interface ProfileFormProps {
 
 export function ProfileForm({ setName, setTitle, setAvatar, name, title, email, location, setEmail, setLocation }: ProfileFormProps) {
   const [avatar, setLocalAvatar] = useState("")
-  const [, setNameLocal] = useState("")
-  const [, setTitleLocal] = useState("")
-  const [, setLocationLocal] = useState("")
-  const [, setEmailLocal] = useState("")
 
-  const handleImageUpload = async (event : any ) => {
+  const handleImageUpload = async (event: any) => {
     const file = event.target.files[0]
     if (file) {
       const formData = new FormData()
@@ -46,14 +41,6 @@ export function ProfileForm({ setName, setTitle, setAvatar, name, title, email, 
         alert("Image upload failed.")
       }
     }
-  }
-
-  const handleSubmit = () => {
-    if (!name || !title || !location || !email) {
-      alert("Please fill in all required fields.")
-      return
-    }
-    // Save data to local storage or state
   }
 
   return (
@@ -78,31 +65,24 @@ export function ProfileForm({ setName, setTitle, setAvatar, name, title, email, 
       <div className="space-y-4">
         <div className="grid gap-2">
           <Label htmlFor="name">Full Name</Label>
-          <Input id="name" placeholder="Enter your full name" value={name} onChange={(e) => {
-            setNameLocal(e.target.value)
-            setName(e.target.value)
-          }} required />
+          <Input id="name" placeholder="Enter your full name" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
 
         <div className="grid gap-2">
           <Label htmlFor="title">Professional Title</Label>
-          <Input id="title" placeholder="e.g. Full Stack Developer" value={title} onChange={(e) => {
-            setTitleLocal(e.target.value)
-            setTitle(e.target.value)
-          }} required />
+          <Input id="title" placeholder="e.g. Full Stack Developer" value={title} onChange={(e) => setTitle(e.target.value)} required />
         </div>
 
         <div className="grid gap-2">
           <Label htmlFor="location">Location</Label>
-          <Input id="location" placeholder="e.g. Tokyo, Japan" value={location} onChange={(e) => setLocationLocal(e.target.value)} required />
+          <Input id="location" placeholder="e.g. Tokyo, Japan" value={location} onChange={(e) => setLocation(e.target.value)} required />
         </div>
 
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="your@email.com" value={email} onChange={(e) => setEmailLocal(e.target.value)} required />
+          <Input id="email" type="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
       </div>
     </div>
   )
 }
-
