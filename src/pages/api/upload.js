@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
     try {
       const result = await cloudinary.uploader.upload(file, {
-        upload_preset: 'your_upload_preset', // Set your upload preset here
+        upload_preset: 'your_upload_preset',
       });
       res.status(200).json({ url: result.secure_url });
     } catch (error) {
