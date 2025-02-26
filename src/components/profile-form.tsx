@@ -8,18 +8,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Upload } from "lucide-react"
 
 interface ProfileFormProps {
-  setName: React.Dispatch<React.SetStateAction<string>>;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
-  setAvatar: React.Dispatch<React.SetStateAction<string>>;
+  setName: (name: string) => void;
+  setTitle: (title: string) => void;
+  setAvatar: (avatar: string) => void;
+  setBio: (bio: string) => void;
+  setEmail: (email: string) => void;
+  setLocation: (location: string) => void;
   name: string;
   title: string;
+  bio: string;
   email: string;
   location: string;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
-  setLocation: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function ProfileForm({ setName, setTitle, setAvatar, name, title, email, location, setEmail, setLocation }: ProfileFormProps) {
+export function ProfileForm({ setName, setTitle, setAvatar, setBio, setEmail, setLocation, name, title, bio, email, location }: ProfileFormProps) {
   const [avatar, setLocalAvatar] = useState("")
 
   const handleImageUpload = async (event: any) => {

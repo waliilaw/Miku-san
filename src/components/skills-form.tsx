@@ -23,70 +23,57 @@ const SUGGESTED_SKILLS = [
   "Git",
 ]
 
-export function SkillsForm() {
-  const [skills, setSkills] = useState<string[]>([])
-  const [input, setInput] = useState("")
+interface SkillsFormProps {
+  skills: string[];
+  setSkills: React.Dispatch<React.SetStateAction<string[]>>;
+}
 
-  const addSkill = (skill: string) => {
-    if (!skills.includes(skill)) {
-      setSkills([...skills, skill])
+export function SkillsForm({ skills, setSkills }: SkillsFormProps) {
+  const [newSkill, setNewSkill] = useState("")
+
+  const handleAddSkill = () => {
+    if (newSkill && !skills.includes(newSkill)) {
+      setSkills([...skills, newSkill])
+      setNewSkill("")
     }
-    setInput("")
   }
 
-  const removeSkill = (skill: string) => {
-    setSkills(skills.filter((s) => s !== skill))
+  const handleRemoveSkill = (skillToRemove: string) => {
+    setSkills(skills.filter(skill => skill !== skillToRemove))
   }
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Skills & Technologies</h2>
-        <p className="text-gray-400">Add your technical skills and technologies you work with</p>
+        <h2 className="text-2xl font-bold">Skills</h2>
+        <p className="text-gray-400">Add your technical skills and expertise</p>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Add a skill..."
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && input.trim()) {
-                e.preventDefault()
-                addSkill(input.trim())
-              }
-            }}
-          />
-          <Button onClick={() => input.trim() && addSkill(input.trim())}>Add</Button>
-        </div>
+      <div className="flex gap-2">
+        <Input
+          value={newSkill}
+          onChange={(e) => setNewSkill(e.target.value)}
+          placeholder="Add a skill (e.g., React, Node.js)"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              handleAddSkill()
+            }
+          }}
+        />
+        <Button onClick={handleAddSkill}>Add</Button>
+      </div>
 
-        <div className="flex flex-wrap gap-2">
-          {skills.map((skill) => (
-            <Badge key={skill} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
-              {skill}
-              <button onClick={() => removeSkill(skill)} className="hover:bg-background/20 rounded-full p-1">
-                <X className="w-3 h-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-sm text-gray-400">Suggested Skills:</p>
-          <div className="flex flex-wrap gap-2">
-            {SUGGESTED_SKILLS.filter((s) => !skills.includes(s)).map((skill) => (
-              <Badge
-                key={skill}
-                variant="outline"
-                className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-                onClick={() => addSkill(skill)}
-              >
-                {skill}
-              </Badge>
-            ))}
-          </div>
-        </div>
+      <div className="flex flex-wrap gap-2">
+        {skills.map((skill, index) => (
+          <Badge key={index} className="px-3 py-1 flex items-center gap-2">
+            {skill}
+            <X 
+              className="h-4 w-4 cursor-pointer" 
+              onClick={() => handleRemoveSkill(skill)}
+            />
+          </Badge>
+        ))}
       </div>
     </div>
   )

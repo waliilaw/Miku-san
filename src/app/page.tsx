@@ -9,17 +9,23 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Particles from "react-particles"
 import { loadFull } from "tsparticles"
-
+import { useRouter } from "next/navigation"
+import type { Engine } from "tsparticles-engine"
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const particlesInit = async (engine: any) => {
-    await loadFull(engine)
+  const particlesInit = async (engine: any ) => {
+    try {
+      await loadFull(engine)
+    } catch (error) {
+      console.error("Error loading particles:", error)
+    }
   }
 
   if (!mounted) return null
@@ -32,7 +38,7 @@ export default function Home() {
             href="/"
             className="text-2xl font-bold bg-gradient-to-r from-[#39c5bb] to-pink-400 text-transparent bg-clip-text"
           >
-            Maki-san
+            Miku-san
           </Link>
           <div className="flex items-center gap-4">
             <Link href="https://twitter.com">
@@ -41,7 +47,7 @@ export default function Home() {
             <Link href="https://github.com">
               <Github className="w-5 h-5 text-[#39c5bb] hover:text-pink-400 transition-colors" />
             </Link>
-            <Button className="bg-[#39c5bb] hover:bg-pink-400 text-black"        onClick={() => window.location.href = '/create'}>Get Started</Button>
+            <Button className="bg-[#39c5bb] hover:bg-pink-400 text-black"        onClick={() => router.push('/create')}>Get Started</Button>
           </div>
         </div>
       </header>
@@ -98,7 +104,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                <Button className="bg-[#39c5bb] hover:bg-pink-400 text-black text-lg px-8 py-6"        onClick={() => window.location.href = '/create'}>
+                <Button className="bg-[#39c5bb] hover:bg-pink-400 text-black text-lg px-8 py-6"        onClick={() => router.push('/create')}>
                   Create Your Own
                 </Button>
               </motion.div>
@@ -180,7 +186,7 @@ export default function Home() {
                   <p className="text-gray-400">Your portfolio looks perfect on any device, automatically.</p>
                   <Button 
                     className="bg-[#39c5bb] hover:bg-pink-400 text-black mt-10" 
-                    onClick={() => window.location.href = '/create'}
+                    onClick={() => router.push('/create')}
                   >
                     Explore Features
                   </Button>

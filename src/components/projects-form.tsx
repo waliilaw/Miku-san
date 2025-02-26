@@ -10,54 +10,99 @@ import { Badge } from "@/components/ui/badge"
 import { Upload, X, Plus } from "lucide-react"
 
 interface Project {
+  id?: string
   title: string
   description: string
   image: string
   technologies: string[]
-  liveUrl?: string
-  githubUrl?: string
+  liveUrl: string | null
+  githubUrl: string | null
+  portfolioId?: string
+  order: number
 }
 
-export function ProjectsForm() {
-  const [projects, setProjects] = useState<Project[]>([])
-  const [currentProject, setCurrentProject] = useState<Project>({
+interface ProjectsFormProps {
+  projects: {
+    title: string;
+    id: string;
+    description: string;
+    image: string;
+    technologies: string[];
+    liveUrl: string | null;
+    githubUrl: string | null;
+    portfolioId: string;
+    order: number;
+  }[];
+  setProjects: React.Dispatch<React.SetStateAction<{
+    title: string;
+    id: string;
+    description: string;
+    image: string;
+    technologies: string[];
+    liveUrl: string | null;
+    githubUrl: string | null;
+    portfolioId: string;
+    order: number;
+  }[]>>;
+}
+
+export function ProjectsForm({ projects, setProjects }: ProjectsFormProps) {
+  const [newProject, setNewProject] = useState<Project>({
     title: "",
     description: "",
     image: "",
     technologies: [],
-    liveUrl: "",
-    githubUrl: "",
+    liveUrl: null,
+    githubUrl: null,
+    order: 0
   })
-  const [techInput, setTechInput] = useState("")
+  const [technology, setTechnology] = useState("")
 
-  const addTechnology = (tech: string) => {
-    if (!currentProject.technologies.includes(tech)) {
-      setCurrentProject({
-        ...currentProject,
-        technologies: [...currentProject.technologies, tech],
+  const handleImageUpload = async (event: any) => {
+    const file = event.target.files[0]
+    if (file) {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
       })
-    }
-    setTechInput("")
-  }
 
-  const removeTechnology = (tech: string) => {
-    setCurrentProject({
-      ...currentProject,
-      technologies: currentProject.technologies.filter((t) => t !== tech),
-    })
+      if (response.ok) {
+        const data = await response.json()
+        setNewProject({ ...newProject, image: data.url })
+      }
+    }
   }
 
   const addProject = () => {
-    if (currentProject.title && currentProject.description) {
-      setProjects([...projects, currentProject])
-      setCurrentProject({
+    if (newProject.title && newProject.description) {
+      setProjects([...projects, {
+        ...newProject,
+        id: crypto.randomUUID(),
+        portfolioId: "",  // or get from props if available
+        order: projects.length
+      }])
+      setNewProject({
         title: "",
         description: "",
         image: "",
         technologies: [],
-        liveUrl: "",
-        githubUrl: "",
+        liveUrl: null,
+        githubUrl: null,
+        order: projects.length + 1
       })
+    }
+  }
+
+  const addTechnology = () => {
+    if (technology && !newProject.technologies.includes(technology)) {
+      setNewProject({
+        ...newProject,
+        technologies: [...newProject.technologies, technology]
+      })
+      setTechnology("")
     }
   }
 
@@ -69,7 +114,7 @@ export function ProjectsForm() {
     <div className="space-y-6">
       <div className="space-y-2">
         <h2 className="text-2xl font-bold">Projects</h2>
-        <p className="text-gray-400">Add your notable projects to showcase your work</p>
+        <p className="text-gray-400">Add your projects to showcase your work</p>
       </div>
 
       <Card className="p-4 space-y-4">
@@ -78,8 +123,8 @@ export function ProjectsForm() {
             <Label htmlFor="title">Project Title</Label>
             <Input
               id="title"
-              value={currentProject.title}
-              onChange={(e) => setCurrentProject({ ...currentProject, title: e.target.value })}
+              value={newProject.title}
+              onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
               placeholder="Enter project title"
             />
           </div>
@@ -88,8 +133,8 @@ export function ProjectsForm() {
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              value={currentProject.description}
-              onChange={(e) => setCurrentProject({ ...currentProject, description: e.target.value })}
+              value={newProject.description}
+              onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
               placeholder="Describe your project"
               className="min-h-[100px]"
             />
@@ -99,23 +144,25 @@ export function ProjectsForm() {
             <Label>Technologies Used</Label>
             <div className="flex gap-2">
               <Input
-                value={techInput}
-                onChange={(e) => setTechInput(e.target.value)}
+                value={technology}
+                onChange={(e) => setTechnology(e.target.value)}
                 placeholder="Add a technology..."
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && techInput.trim()) {
+                  if (e.key === "Enter" && technology.trim()) {
                     e.preventDefault()
-                    addTechnology(techInput.trim())
+                    addTechnology()
                   }
                 }}
               />
-              <Button onClick={() => techInput.trim() && addTechnology(techInput.trim())}>Add</Button>
+              <Button onClick={addTechnology} type="button">
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {currentProject.technologies.map((tech) => (
-                <Badge key={tech} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
+              {newProject.technologies.map((tech, index) => (
+                <Badge key={index} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
                   {tech}
-                  <button onClick={() => removeTechnology(tech)} className="hover:bg-background/20 rounded-full p-1">
+                  <button onClick={() => removeProject(index)} className="hover:bg-background/20 rounded-full p-1">
                     <X className="w-3 h-3" />
                   </button>
                 </Badge>
@@ -128,8 +175,8 @@ export function ProjectsForm() {
             <div className="flex gap-2">
               <Input
                 id="image"
-                value={currentProject.image}
-                onChange={(e) => setCurrentProject({ ...currentProject, image: e.target.value })}
+                value={newProject.image}
+                onChange={(e) => setNewProject({ ...newProject, image: e.target.value })}
                 placeholder="Enter image URL or upload"
               />
               <Button variant="outline" className="gap-2">
@@ -144,8 +191,8 @@ export function ProjectsForm() {
               <Label htmlFor="liveUrl">Live Demo URL</Label>
               <Input
                 id="liveUrl"
-                value={currentProject.liveUrl}
-                onChange={(e) => setCurrentProject({ ...currentProject, liveUrl: e.target.value })}
+                value={newProject.liveUrl || ""}
+                onChange={(e) => setNewProject({ ...newProject, liveUrl: e.target.value as string | null })}
                 placeholder="https://..."
               />
             </div>
@@ -153,8 +200,8 @@ export function ProjectsForm() {
               <Label htmlFor="githubUrl">GitHub URL</Label>
               <Input
                 id="githubUrl"
-                value={currentProject.githubUrl}
-                onChange={(e) => setCurrentProject({ ...currentProject, githubUrl: e.target.value })}
+                value={newProject.githubUrl || ""}
+                onChange={(e) => setNewProject({ ...newProject, githubUrl: e.target.value as string | null })}
                 placeholder="https://github.com/..."
               />
             </div>
@@ -172,11 +219,23 @@ export function ProjectsForm() {
           <Card key={index} className="p-4">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-semibold">{project.title}</h3>
+                <h3 className="font-bold">{project.title}</h3>
                 <p className="text-sm text-gray-400">{project.description}</p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {project.technologies.map((tech, i) => (
+                    <span key={i} className="bg-[#39c5bb]/20 text-[#39c5bb] px-2 py-1 rounded-full text-xs">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => removeProject(index)}>
-                <X className="w-4 h-4" />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => removeProject(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </div>
           </Card>

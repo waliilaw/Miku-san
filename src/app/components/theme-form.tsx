@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Card } from "@/components/ui/card"
+import { Button } from "./ui/button"
+import { Label } from "./ui/label"
+import { RadioGroup as CustomRadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { Card } from "./ui/card"
 import { Check } from "lucide-react"
 
 const THEMES = [
@@ -34,12 +34,17 @@ const THEMES = [
   },
 ]
 
-interface ThemeFormProps {
-  theme: string;
-  setTheme: (theme: string) => void;
+interface RadioGroupProps {
+  value: string;
+  onValueChange: (value: string) => void;
+  className?: string;
 }
 
-export function ThemeForm({ theme, setTheme }: ThemeFormProps) {
+
+
+export function ThemeForm() {
+  const [selectedTheme, setSelectedTheme] = useState(THEMES[0].name)
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -47,20 +52,20 @@ export function ThemeForm({ theme, setTheme }: ThemeFormProps) {
         <p className="text-gray-400">Choose a theme for your portfolio</p>
       </div>
 
-      <RadioGroup value={theme} onValueChange={setTheme} className="grid grid-cols-2 gap-4">
-        {THEMES.map((themeOption) => (
-          <Label key={themeOption.name} className="cursor-pointer">
-            <RadioGroupItem value={themeOption.name} className="sr-only" />
-            <Card className={`p-4 ${theme === themeOption.name ? "ring-2 ring-primary" : ""}`}>
+      <CustomRadioGroup value={selectedTheme} onValueChange={setSelectedTheme} className="grid grid-cols-2 gap-4">
+        {THEMES.map((theme) => (
+          <Label key={theme.name} className="cursor-pointer">
+            <RadioGroupItem value={theme.name} className="sr-only" />
+            <Card className={`p-4 ${selectedTheme === theme.name ? "ring-2 ring-primary" : ""}`}>
               <div className="flex justify-between items-start mb-4">
-                <span className="font-medium">{themeOption.name}</span>
-                {theme === themeOption.name && <Check className="w-4 h-4 text-primary" />}
+                <span className="font-medium">{theme.name}</span>
+                {selectedTheme === theme.name && <Check className="w-4 h-4 text-primary" />}
               </div>
-              <div className={`h-20 rounded-lg ${themeOption.preview}`} />
+              <div className={`h-20 rounded-lg ${theme.preview}`} />
             </Card>
           </Label>
         ))}
-      </RadioGroup>
+      </CustomRadioGroup>
 
       <div className="pt-4">
         <Button className="w-full">Apply Theme</Button>
