@@ -1,71 +1,57 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { motion } from "framer-motion"
+import { themes } from "@/lib/themes"
+import type { ThemeType } from "@/lib/themes"
 import { Card } from "@/components/ui/card"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
 import { Check } from "lucide-react"
-
-const THEMES = [
-  {
-    name: "Miku Classic",
-    primary: "#39c5bb",
-    secondary: "#ec4899",
-    preview: "bg-gradient-to-r from-[#39c5bb] to-pink-400",
-  },
-  {
-    name: "Cyber Night",
-    primary: "#00ff9f",
-    secondary: "#00b8ff",
-    preview: "bg-gradient-to-r from-[#00ff9f] to-[#00b8ff]",
-  },
-  {
-    name: "Sakura",
-    primary: "#ff758f",
-    secondary: "#ff7eb3",
-    preview: "bg-gradient-to-r from-[#ff758f] to-[#ff7eb3]",
-  },
-  {
-    name: "Ocean Wave",
-    primary: "#0ea5e9",
-    secondary: "#2dd4bf",
-    preview: "bg-gradient-to-r from-[#0ea5e9] to-[#2dd4bf]",
-  },
-]
+import { fadeIn, cardVariants } from "@/lib/animations"
 
 interface ThemeFormProps {
-  theme: string;
-  setTheme: (theme: string) => void;
+  theme: ThemeType
+  setTheme: (theme: ThemeType) => void
 }
 
 export function ThemeForm({ theme, setTheme }: ThemeFormProps) {
   return (
-    <div className="space-y-6">
+    <motion.div className="space-y-6" initial={fadeIn.initial} animate={fadeIn.animate} exit={fadeIn.exit}>
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Theme Customization</h2>
-        <p className="text-gray-400">Choose a theme for your portfolio</p>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-[#39c5bb] to-pink-400 bg-clip-text text-transparent">
+          Theme Customization
+        </h2>
+        <p className="text-gray-400">Choose a theme that matches your style</p>
       </div>
 
-      <RadioGroup value={theme} onValueChange={setTheme} className="grid grid-cols-2 gap-4">
-        {THEMES.map((themeOption) => (
-          <Label key={themeOption.name} className="cursor-pointer">
-            <RadioGroupItem value={themeOption.name} className="sr-only" />
-            <Card className={`p-4 ${theme === themeOption.name ? "ring-2 ring-primary" : ""}`}>
-              <div className="flex justify-between items-start mb-4">
-                <span className="font-medium">{themeOption.name}</span>
-                {theme === themeOption.name && <Check className="w-4 h-4 text-primary" />}
-              </div>
-              <div className={`h-20 rounded-lg ${themeOption.preview}`} />
-            </Card>
-          </Label>
+      <RadioGroup
+        value={theme}
+        onValueChange={(value) => setTheme(value as ThemeType)}
+        className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+      >
+        {Object.entries(themes).map(([themeName, themeValues]) => (
+          <motion.div key={themeName} variants={cardVariants} initial="initial" animate="animate" exit="exit">
+            <Label className="cursor-pointer">
+              <RadioGroupItem value={themeName} className="sr-only" />
+              <Card
+                className={`p-4 transition-all duration-300 ${
+                  theme === themeName ? "ring-2 ring-[#39c5bb] bg-black/60" : "bg-black/40 hover:bg-black/50"
+                }`}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <span className="font-medium">{themeName.charAt(0).toUpperCase() + themeName.slice(1)}</span>
+                  {theme === themeName && <Check className="w-4 h-4 text-[#39c5bb]" />}
+                </div>
+                <div
+                  className={`h-20 rounded-lg bg-gradient-to-r ${themeValues.gradient} 
+                    transition-transform duration-300 hover:scale-105`}
+                />
+              </Card>
+            </Label>
+          </motion.div>
         ))}
       </RadioGroup>
-
-      <div className="pt-4">
-        <Button className="w-full">Apply Theme</Button>
-      </div>
-    </div>
+    </motion.div>
   )
 }
 

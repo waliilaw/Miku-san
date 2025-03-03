@@ -22,28 +22,8 @@ interface Project {
 }
 
 interface ProjectsFormProps {
-  projects: {
-    title: string;
-    id: string;
-    description: string;
-    image: string;
-    technologies: string[];
-    liveUrl: string | null;
-    githubUrl: string | null;
-    portfolioId: string;
-    order: number;
-  }[];
-  setProjects: React.Dispatch<React.SetStateAction<{
-    title: string;
-    id: string;
-    description: string;
-    image: string;
-    technologies: string[];
-    liveUrl: string | null;
-    githubUrl: string | null;
-    portfolioId: string;
-    order: number;
-  }[]>>;
+  projects: Project[];
+  setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
 }
 
 export function ProjectsForm({ projects, setProjects }: ProjectsFormProps) {
@@ -57,10 +37,12 @@ export function ProjectsForm({ projects, setProjects }: ProjectsFormProps) {
     order: 0
   })
   const [technology, setTechnology] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const handleImageUpload = async (event: any) => {
-    const file = event.target.files[0]
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
     if (file) {
+      setLoading(true)
       const formData = new FormData()
       formData.append("file", file)
 
@@ -72,7 +54,10 @@ export function ProjectsForm({ projects, setProjects }: ProjectsFormProps) {
       if (response.ok) {
         const data = await response.json()
         setNewProject({ ...newProject, image: data.url })
+      } else {
+        alert("Image upload failed.")
       }
+      setLoading(false)
     }
   }
 
@@ -179,11 +164,19 @@ export function ProjectsForm({ projects, setProjects }: ProjectsFormProps) {
                 onChange={(e) => setNewProject({ ...newProject, image: e.target.value })}
                 placeholder="Enter image URL or upload"
               />
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2" onClick={() => document.getElementById('image-upload')?.click()}>
                 <Upload className="w-4 h-4" />
                 Upload
               </Button>
+              <input
+                type="file"
+                id="image-upload"
+                onChange={handleImageUpload}
+                accept="image/*"
+                className="hidden"
+              />
             </div>
+            {loading && <p>Loading...</p>}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -208,9 +201,9 @@ export function ProjectsForm({ projects, setProjects }: ProjectsFormProps) {
           </div>
         </div>
 
-        <Button onClick={addProject} className="w-full">
+        <Button onClick={addProject} className="w-full" disabled={loading}>
           <Plus className="w-4 h-4 mr-2" />
-          Add Project
+          {loading ? "Uploading..." : "Add Project"}
         </Button>
       </Card>
 

@@ -15,9 +15,11 @@ model Portfolio {
   title       String
   bio         String
   email       String
+
   location    String
   avatar      String?
   skills      String[]
+  theme       String      @default("pink")
   projects    Project[]
   socialLinks SocialLinks?
   createdAt   DateTime    @default(now())
@@ -42,6 +44,7 @@ model SocialLinks {
   github      String?
   twitter     String?
   linkedin    String?
+  instagram   String?
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
   portfolioId String    @unique
 }

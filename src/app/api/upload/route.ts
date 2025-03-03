@@ -15,13 +15,9 @@ export async function POST(req: Request) {
       return new NextResponse("No file provided", { status: 400 });
     }
 
-    // Upload to Cloudinary
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
     const formDataForCloudinary = new FormData();
-    formDataForCloudinary.append("file", buffer.toString('base64'));
-    formDataForCloudinary.append("upload_preset", "YOUR_UPLOAD_PRESET");
+    formDataForCloudinary.append("file", file);
+    formDataForCloudinary.append("upload_preset", "Mikusan");
 
     const uploadResponse = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -32,10 +28,16 @@ export async function POST(req: Request) {
     );
 
     const uploadData = await uploadResponse.json();
+    console.log('Upload data:', uploadData); // Log the entire uploadData object
 
-    return NextResponse.json({ url: uploadData.secure_url });
+    if (uploadData.secure_url) {
+      return NextResponse.json({ url: uploadData.secure_url });
+    } else {
+      console.error("Upload failed:", uploadData);
+      return new NextResponse("Upload failed", { status: 500 });
+    }
   } catch (error) {
     console.error("Upload error:", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-} 
+}

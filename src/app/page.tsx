@@ -11,6 +11,8 @@ import Particles from "react-particles"
 import { loadFull } from "tsparticles"
 import { useRouter } from "next/navigation"
 import type { Engine } from "tsparticles-engine"
+import Dither from "../components/Dither"
+import CardComponent from "../components/Card"
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -31,7 +33,9 @@ export default function Home() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-black text-white">
+   
+<div>
+
       <header className=" fixed top-0 w-full z-50 bg-black/50 backdrop-blur-sm">
         <div className=" container mx-auto  py-4 flex justify-between items-center">
           <Link

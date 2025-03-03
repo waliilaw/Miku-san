@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,28 +22,41 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ setName, setTitle, setAvatar, setBio, setEmail, setLocation, name, title, bio, email, location }: ProfileFormProps) {
-  const [avatar, setLocalAvatar] = useState("")
+  const [localAvatar, setLocalAvatar] = useState("")
+  const [loading, setLoading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleImageUpload = async (event: any) => {
-    const file = event.target.files[0]
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    console.log('File selected:', file);
     if (file) {
-      const formData = new FormData()
-      formData.append("file", file)
-
+      setLoading(true)
+      const formData = new FormData();
+      formData.append("file", file);
+      console.log('Uploading file...');
+  
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
-      })
-
+      });
+  
+      console.log('Upload response:', response);
       if (response.ok) {
-        const data = await response.json()
-        setLocalAvatar(data.url)
-        setAvatar(data.url)
+        const data = await response.json();
+        console.log('Uploaded image URL:', data.url); // This should now log the correct URL
+        setLocalAvatar(data.url);
+        setAvatar(data.url);
       } else {
-        alert("Image upload failed.")
+        alert("Image upload failed.");
       }
+      setLoading(false)
+    } else {
+      console.log('No file selected.');
     }
-  }
+  };
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <div className="space-y-6">
@@ -54,14 +67,20 @@ export function ProfileForm({ setName, setTitle, setAvatar, setBio, setEmail, se
 
       <div className="flex items-center gap-6">
         <Avatar className="w-24 h-24">
-          <AvatarImage src={avatar} />
+          <AvatarImage src={localAvatar || undefined} />
           <AvatarFallback>Upload</AvatarFallback>
         </Avatar>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2" onClick={handleButtonClick} disabled={loading}>
           <Upload className="w-4 h-4" />
-          <input type="file" onChange={handleImageUpload} accept="image/*" className="hidden" />
-          Upload Avatar
+          {loading ? "Uploading..." : "Upload Avatar"}
         </Button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImageUpload}
+          accept="image/*"
+          className="hidden"
+        />
       </div>
 
       <div className="space-y-4">
@@ -71,7 +90,7 @@ export function ProfileForm({ setName, setTitle, setAvatar, setBio, setEmail, se
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="title">Professional Title</Label>
+          <Label htmlFor="title">Bio</Label>
           <Input id="title" placeholder="e.g. Full Stack Developer" value={title} onChange={(e) => setTitle(e.target.value)} required />
         </div>
 

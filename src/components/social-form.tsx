@@ -3,15 +3,30 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Github, Twitter, Linkedin, Instagram, Youtube, Globe } from "lucide-react"
+import { Github, Twitter, Linkedin, Instagram } from "lucide-react"
 
 interface SocialLinks {
   github?: string
   twitter?: string
   linkedin?: string
+  instagram?: string
 }
 
 export function SocialForm({ socialLinks, setSocialLinks }: { socialLinks: SocialLinks, setSocialLinks: (socialLinks: SocialLinks) => void }) {
+  const [githubUsername, setGithubUsername] = useState(socialLinks.github?.split('/').pop() || "")
+  const [twitterUsername, setTwitterUsername] = useState(socialLinks.twitter?.split('/').pop() || "")
+  const [linkedinUsername, setLinkedinUsername] = useState(socialLinks.linkedin?.split('/').pop() || "")
+  const [instagramUsername, setInstagramUsername] = useState(socialLinks.instagram?.split('/').pop() || "")
+
+  const handleSave = () => {
+    setSocialLinks({
+      github: githubUsername ? `https://github.com/${githubUsername}` : undefined,
+      twitter: twitterUsername ? `https://twitter.com/${twitterUsername}` : undefined,
+      linkedin: linkedinUsername ? `https://linkedin.com/in/${linkedinUsername}` : undefined,
+      instagram: instagramUsername ? `https://instagram.com/${instagramUsername}` : undefined,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -23,29 +38,40 @@ export function SocialForm({ socialLinks, setSocialLinks }: { socialLinks: Socia
         <div>
           <Label>GitHub</Label>
           <Input 
-            placeholder="https://github.com/username"
-            value={socialLinks.github || ""}
-            onChange={(e) => setSocialLinks({ ...socialLinks, github: e.target.value })}
+            placeholder="username"
+            value={githubUsername}
+            onChange={(e) => setGithubUsername(e.target.value)}
+            onBlur={handleSave}
           />
         </div>
         <div>
           <Label>Twitter</Label>
           <Input 
-            placeholder="https://twitter.com/username"
-            value={socialLinks.twitter || ""}
-            onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })}
+            placeholder="username"
+            value={twitterUsername}
+            onChange={(e) => setTwitterUsername(e.target.value)}
+            onBlur={handleSave}
           />
         </div>
         <div>
           <Label>LinkedIn</Label>
           <Input 
-            placeholder="https://linkedin.com/in/username"
-            value={socialLinks.linkedin || ""}
-            onChange={(e) => setSocialLinks({ ...socialLinks, linkedin: e.target.value })}
+            placeholder="username"
+            value={linkedinUsername}
+            onChange={(e) => setLinkedinUsername(e.target.value)}
+            onBlur={handleSave}
+          />
+        </div>
+        <div>
+          <Label>Instagram</Label>
+          <Input 
+            placeholder="username"
+            value={instagramUsername}
+            onChange={(e) => setInstagramUsername(e.target.value)}
+            onBlur={handleSave}
           />
         </div>
       </div>
     </div>
   )
 }
-
