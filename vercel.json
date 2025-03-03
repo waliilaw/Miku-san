@@ -1,3 +1,5 @@
+
+
 {
   "version": 2,
   "builds": [
@@ -19,5 +21,5 @@
   "env": {
     "MY_ENV_VARIABLE": "value"
   },
-  "buildCommand": "tsc --noEmit || true"
+  "buildCommand": "npm run build || true" 
 }
